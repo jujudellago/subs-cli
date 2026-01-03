@@ -5,6 +5,8 @@
   "private": false,
   "main": "dist/Run.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/Run.js",
     "postuninstall": "node ./dist/Uninstall.js"
   },
   "author": "Alexandru Cancescu",
