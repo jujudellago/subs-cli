@@ -33,12 +33,6 @@ function start() {
         }
         yield Preferences_1.default.loadPreferences();
         const lang = getLanguage();
-        // await downloadFile(
-        // 	"https://dl.opensubtitles.org/en/download/src-api/vrf-19cc0c5d/sid-5db4NRRCgE4S2f0cf7hygCtGqTf/file/1953905758.gz",
-        // 	// "https://img.freepik.com/free-vector/abstract-technology-particle-background_52683-25766i.jpg?size=626&ext=jpg",
-        // 	"/Users/andu/Downloads/sub.srt",
-        // 	true,
-        // );
         osub = yield (0, Authentication_1.default)();
         const downloadWatcher = new DownloadEventHandler_1.default(files.length);
         for (let file of files) {
@@ -51,14 +45,6 @@ function start() {
         if (quota > -1) {
             console.log(chalk.yellowBright(`${os_1.EOL}OpenSubtitle.org download quota: ${chalk.bold(quota)}`));
         }
-        // const subs=await (await authenticate()).search({
-        // 	sublanguageid:"eng",
-        // 	path:"/Users/andu/Downloads/Breaking.Bad.S05.1080p.BluRay.x264-ROVERS/breaking.bad.s05e11.1080p.bluray.x264-rovers.mkv",
-        // 	filename:"breaking.bad.s05e11.1080p.bluray.x264-rovers.mkv",
-        // 	gzip:true,
-        // });
-        //
-        // console.log(subs);
     });
 }
 function printResult(result) {
@@ -95,26 +81,14 @@ function downloadSubtitle(file, lang) {
             const downloadInfo = yield osub.download({
                 file_id: sub.attributes.files[0].file_id
             });
-            // The new API might return a link that doesn't need unzipping if it's not zipped, but usually they are.
-            // Also the new API returns file_name in the sub attributes, we can use that for extension or stick to .srt
-            const headers = yield (0, Util_1.downloadFile)(downloadInfo.link, file.replace(/\.[^.]*$/, `.srt`), false);
-            // Note: New API downloads might not be gzipped, and downloadFile defaults unzip to true.
-            // We set unzip to false for now, assuming direct link to SRT or we need to check headers.
-            // Actually, OpenSubtitles.com often sends JSON response for download if quota exceeded, but wrapper should handle errors.
-            // If it returns a link, it's usually the file.
-            // We should check if it needs unzipping. The old API was always gzip.
-            // The new API usually returns a link to the raw subtitle file (e.g. .srt) or a zip.
-            // If it's a zip, we need to unzip.
-            // But the downloadFile utility assumes gzip stream if unzip is true.
-            // Let's assume false for now, and improve if needed.
-            const dowQuota = Number.parseInt(headers["download-quota"]); // Check if this header exists in new API
+            // The updated downloadFile now handles zip extraction automatically
+            // We pass the path to the expected .srt file, downloadFile will handle saving it.
+            const targetFile = file.replace(/\.[^.]*$/, `.srt`);
+            const headers = yield (0, Util_1.downloadFile)(downloadInfo.link, targetFile);
+            const dowQuota = Number.parseInt(headers["download-quota"]);
             if (!Number.isNaN(dowQuota)) {
                 quota = dowQuota;
             }
-            // New API returns quota info in response usually, but we are just downloading the file from the link here.
-            // The link might be from a CDN. Quota info comes from the API response of `download()`,
-            // but the wrapper returns just the body.
-            // We might need to check if wrapper returns quota info.
         }
         catch (e) {
             throw new DownloadEventHandler_1.DownloadError(e.message, fileBaseName);
@@ -124,19 +98,26 @@ function downloadSubtitle(file, lang) {
 }
 function searchSubtitles(videoFile, lang) {
     return __awaiter(this, void 0, void 0, function* () {
-        // We need to calculate moviehash.
-        // Since we don't have a hash function yet, let's look for one or implement one.
-        // For now, I'll search by query (filename) if hash is not available, but hash is better.
-        // I need to implement movie hashing. OpenSubtitles uses a specific hash.
-        // I will try to use the query search first as a fallback or primary if I can't easily implement hash right now.
-        // But existing logic used path and filename which implies hashing.
-        // Let's rely on query search using filename for this iteration as it's simpler and supported.
+        // Calculate hash
+        const hash = yield (0, Util_1.computeHash)(videoFile);
+        // Search using hash and query (fallback or combined?)
+        // API docs say we can use moviehash.
         const subsFound = yield osub.subtitles({
             languages: lang.alpha2,
-            query: (0, path_1.basename)(videoFile).replace(/\.[^/.]+$/, ""), // Remove extension for better query
-            // moviehash: ...
+            moviehash: hash
         });
-        return subsFound.data || [];
+        // Fallback to filename search if no hash results?
+        // The original tool might have done this or just hash.
+        // If we want robustness, we can try filename if hash yields 0 results.
+        if (subsFound.data && subsFound.data.length > 0) {
+            return subsFound.data;
+        }
+        // Fallback query search
+        const subsFoundByQuery = yield osub.subtitles({
+            languages: lang.alpha2,
+            query: (0, path_1.basename)(videoFile).replace(/\.[^/.]+$/, "")
+        });
+        return subsFoundByQuery.data || [];
     });
 }
 function getLanguage() {

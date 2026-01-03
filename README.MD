@@ -1,42 +1,45 @@
-# Subtitles CLI
+# OpenSub CLI
 
-A full featured, easy to use, CLI app to download subtitles from opensubtitles.org.
+A full featured, easy to use, CLI app to download subtitles from **OpenSubtitles.com**.
+
+> **Note:** This version uses the new OpenSubtitles.com REST API and requires an API Key.
 
 ![](subs-terminal.gif)
 
 ## Features
 
 -  🎞 Download subtitles for a movie file or an entire folder of video files
--  ⌨️ Login with your opensubtitles.org account
--  🏝 Stores preferences for language and opensubtitles.org account
+-  ⌨️ Login with your OpenSubtitles.com account (Username, Password, and API Key)
+-  #️⃣ Search using file hash (OpenSubtitles Hash) or filename
+-  🏝 Stores preferences for language and account
 -  ⚔️ Secure! Your account credentials are stored encrypted by your operating system using Keychain/Credential Vault/Secret Service API
--  ⌛️ Shows download quota from opensubtitles.org
+-  ⌛️ Shows download quota
 
 ## Install
 
 ```shell script
-npm install -g subs-cli
+npm install -g opensub-cli
 ```
 
-If you encounter EACCES error on Mac OS read [Installation Problems](#installation-problems) section. 
+**Note:** This package is currently in beta/test phase.
 
 ## Usage
 
 ##### Download subtitles for all the video files in a directory
 ```
-subs /path/to/dir
+opensub /path/to/dir
 ```
 
 ##### Download subtitles for a single video file
 ```
-subs /path/to/file.mkv
+opensub /path/to/file.mkv
 ```
 
 ##### Help
 ```
-subs -h
+opensub -h
 
-Usage: subs <path> [options]
+Usage: opensub <path> [options]
 
 Options:
   -V, --version       output the version number
@@ -48,41 +51,25 @@ Options:
   -h, --help          display help for command
 ```
 
-##### Save language
+## Setup
 
-If a language is specified with **--lang** option, using **--save-lang** flag will save it as the default language
- 
-##### Overwrite
-
-Using **--overwrite** flag will download and overwrite existing subtitles. Default behaviour is to ignore videos that already have subtitles.
+On the first run, you will be asked to provide your OpenSubtitles.com credentials:
+1.  **Username**
+2.  **Password**
+3.  **API Key** (Get one from [OpenSubtitles Consumer Panel](https://www.opensubtitles.com/en/consumers))
 
 ## Installation problems
 
+### Linux
+
+You may need to install `libsecret` development headers for the secure storage module (`keytar`) to build:
+```bash
+sudo apt-get install libsecret-1-dev
+```
+
 ### Mac OS
 
-For MacOS npm installs global packages into /usr/local/lib/node_modules. You might need to run the install with sudo.
-
-```shell script
-sudo npm install -g subs-cli
-```
-
-That might cause another problem, as npm drops the sudo privileges for packages that run scripts, and sets the user to "nobody".
-This will cause **keytar** (the package that manages the secure storage of account passwords) 
-to not be able to install it's prebuilt native modules, as it cannot create a folder for them. 
-
-The only workarounds are to either change the ownership of **node_modules** dir, and install
-npm global packages without sudo
-```shell script
-sudo chown -R yourusername:admin /usr/local/lib/node_modules
-npm install -g subs-cli
-```
-
-or run the npm install command with --unsafe-perm
-```shell script
-sudo npm install -g --unsafe-perm subs-cli
-```
-
-I am actively looking for a better workaround. More info [here](https://stackoverflow.com/questions/47252451/permission-denied-when-installing-npm-modules-in-osx).
+If you encounter permission errors, try running with `--unsafe-perm` or fixing npm permissions.
 
 ## License
 
