@@ -9,7 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadFile = exports.getLang = exports.isString = void 0;
+exports.isString = isString;
+exports.getLang = getLang;
+exports.downloadFile = downloadFile;
 const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
 const https = require("https");
@@ -17,7 +19,7 @@ const zlib_1 = require("zlib");
 const stream_1 = require("stream");
 const util_1 = require("util");
 const fs_1 = require("fs");
-const pipe = util_1.promisify(stream_1.pipeline);
+const pipe = (0, util_1.promisify)(stream_1.pipeline);
 function isString(...str) {
     for (let s of str) {
         if (typeof s !== "string" || s.length < 1) {
@@ -26,9 +28,8 @@ function isString(...str) {
     }
     return true;
 }
-exports.isString = isString;
 function getLang(lang) {
-    const languages = fs_extra_1.readJsonSync(path_1.join(__dirname, "../langs.json"));
+    const languages = (0, fs_extra_1.readJsonSync)((0, path_1.join)(__dirname, "../langs.json"));
     let code = null;
     if (lang.length === 2) {
         code = languages.find(l => l.alpha2 === lang);
@@ -38,9 +39,8 @@ function getLang(lang) {
     }
     return code;
 }
-exports.getLang = getLang;
-function downloadFile(url, path, unzip = true) {
-    return __awaiter(this, void 0, void 0, function* () {
+function downloadFile(url_1, path_2) {
+    return __awaiter(this, arguments, void 0, function* (url, path, unzip = true) {
         return new Promise((resolve, reject) => {
             https.get(url, {
                 headers: {
@@ -49,9 +49,9 @@ function downloadFile(url, path, unzip = true) {
             }, res => {
                 if (res.statusCode === 200) {
                     let writeFile;
-                    let fStream = fs_1.createWriteStream(path);
+                    let fStream = (0, fs_1.createWriteStream)(path);
                     if (unzip) {
-                        writeFile = pipe(res, zlib_1.createUnzip(), fStream);
+                        writeFile = pipe(res, (0, zlib_1.createUnzip)(), fStream);
                     }
                     writeFile
                         .then(() => resolve(res.headers))
@@ -64,5 +64,4 @@ function downloadFile(url, path, unzip = true) {
         });
     });
 }
-exports.downloadFile = downloadFile;
 //# sourceMappingURL=Util.js.map
