@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = parse;
 const commander = require("commander");
 const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
 const os_1 = require("os");
 function parse() {
     var _a, _b, _c, _d;
-    const pack = fs_extra_1.readJsonSync(path_1.join(__dirname, "../package.json"));
+    const pack = (0, fs_extra_1.readJsonSync)((0, path_1.join)(__dirname, "../package.json"));
     const program = new commander.Command("subs");
     program.version(pack.version);
     program.option("-l, --lang <value>", "the language of the subtitles (eng/en, fr/fre, ro/rum, ...) (default: eng)");
@@ -16,7 +17,7 @@ function parse() {
     program.option("-p, --path", "path of file or dir of files to download subtitles for");
     program.option("-s, --save-lang", "save the current language as default");
     program.option("-N, --no-prompt", "the app will not prompt for any user input");
-    if (os_1.platform() === "darwin") {
+    if ((0, os_1.platform)() === "darwin") {
         program.option("-n, --notification-output", "show output as a notification");
     }
     program.usage("<path> [options]");
@@ -34,5 +35,4 @@ function parse() {
         noPrompt: (_d = program.noPrompt) !== null && _d !== void 0 ? _d : false,
     };
 }
-exports.default = parse;
 //# sourceMappingURL=ArgPars.js.map

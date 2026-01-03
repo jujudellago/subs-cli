@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { ILanguage } from "./Types";
 import { IncomingHttpHeaders } from "http";
 export declare function isString(...str: string[]): boolean;

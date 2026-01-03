@@ -13,14 +13,14 @@ exports.PREF_DIR = void 0;
 const platform_folders_1 = require("platform-folders");
 const fs_extra_1 = require("fs-extra");
 const path_1 = require("path");
-exports.PREF_DIR = path_1.join(platform_folders_1.getDataHome(), "Subtitles CLI");
-const PREF_FILE = path_1.join(exports.PREF_DIR, "preferences.json");
+exports.PREF_DIR = (0, path_1.join)((0, platform_folders_1.getDataHome)(), "Subtitles CLI");
+const PREF_FILE = (0, path_1.join)(exports.PREF_DIR, "preferences.json");
 class Preferences {
     loadPreferences() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield fs_extra_1.ensureFile(PREF_FILE);
+            yield (0, fs_extra_1.ensureFile)(PREF_FILE);
             try {
-                const pref = yield fs_extra_1.readJson(PREF_FILE);
+                const pref = yield (0, fs_extra_1.readJson)(PREF_FILE);
                 this._lang = pref.lang;
                 this._account = pref.account;
                 this._useragent = pref.useragent;
@@ -31,7 +31,7 @@ class Preferences {
         });
     }
     writeFile() {
-        fs_extra_1.writeJsonSync(PREF_FILE, {
+        (0, fs_extra_1.writeJsonSync)(PREF_FILE, {
             lang: this._lang,
             account: this._account,
             useragent: this._useragent
